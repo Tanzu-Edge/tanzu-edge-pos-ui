@@ -1,0 +1,10 @@
+#@ load("@ytt:data", "data")
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: pos-ui-config
+data:
+  SPRING_PROFILES_ACTIVE: pos-ui
+  POS_STOREID: #@ data.values.storeId
+  POS_BACKEND: #@ data.values.senderUri
+  MANAGEMENT_METRICS_EXPORT_WAVEFRONT_URI: #@ data.values.wavefrontProxyUri

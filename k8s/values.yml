@@ -1,0 +1,8 @@
+#@data/values
+---
+storeId: robotSite1
+senderUri: pos-sender
+image: harbor.edge-mgmt.customer0.io/tas-apps/a40e120c-fdba-4641-8703-86b546a0aa28:latest
+ingressDomain: site-0.storm.pvd.pez.pivotal.io
+posUri: pos.site.storm.pvd.pez.pivotal.io
+wavefrontProxyUri: proxy://wavefront-proxy-tanzu.tanzu-observability-saas:2878
