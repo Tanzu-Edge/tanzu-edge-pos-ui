@@ -14,6 +14,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Metrics;
+import io.opentracing.Tracer;
 import vmw.tanzu.gaf.pos.dao.entity.Sale;
 
 @RestController
@@ -26,11 +30,16 @@ public class SalesController {
 	@Value("${posBackend:'http://localhost:8080/api/sales/blah'}")
 	private String posBackend;
 	
+	@Value("${pos.storeId}")
+	private String storeId;
 	
 	@GetMapping("/api/sales/initTransaction")
     public String initTransaction() {
 		return this.generateTransactionId();
     }
+	
+	@Autowired
+    private Tracer tracer;
 	
 	@PostMapping("/api/sales/blah")
 	public void blahTransaction(@RequestBody Sale sale){
@@ -44,6 +53,8 @@ public class SalesController {
 		
 		System.out.println("URI "+posBackend);
 		ResponseEntity<Object> response = restTemplate.postForEntity( posBackend, sale, Object.class );
+		
+		Metrics.counter("inStore.purchases", "store.ID", storeId).increment(sale.getTotal());
 		
 		return response;
 

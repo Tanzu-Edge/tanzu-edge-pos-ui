@@ -1,21 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>2.3.3.RELEASE</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>vmw.tanzu.gaf</groupId>
 	<artifactId>pos</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>pos</name>
-	<description>Point of Sale</description>
+	<name>pos-ui</name>
+	<description>Tanzu POS project for Edge</description>
 
 	<properties>
-		<java.version>8</java.version>
+		<java.version>11</java.version>
+		<wavefront.version>2.0.0</wavefront.version>
+		<sleuth.version>2.2.3.RELEASE</sleuth.version>
 	</properties>
 
 	<dependencies>
@@ -24,24 +27,24 @@
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
 		<dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
- 
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-           <!-- <scope>test</scope> --> 
-        </dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<!-- <scope>test</scope> -->
+		</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
-	      <groupId>org.springframework.boot</groupId>
-	      <artifactId>spring-boot-starter-jdbc</artifactId>
-	    </dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-jdbc</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
@@ -54,9 +57,35 @@
 			</exclusions>
 		</dependency>
 		<dependency>
-		    <groupId>org.xerial</groupId>
-		    <artifactId>sqlite-jdbc</artifactId>
-		    <version>3.28.0</version>
+			<groupId>org.xerial</groupId>
+			<artifactId>sqlite-jdbc</artifactId>
+			<version>3.28.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.wavefront</groupId>
+			<artifactId>wavefront-spring-boot-starter</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-registry-wavefront</artifactId>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/io.opentracing.contrib/opentracing-spring-cloud-starter -->
+		<dependency>
+			<groupId>io.opentracing.contrib</groupId>
+			<artifactId>opentracing-spring-cloud-starter</artifactId>
+			<version>0.5.7</version>
+		</dependency>
+
+
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<scope>runtime</scope>
 		</dependency>
 
 
@@ -65,7 +94,24 @@
 			<artifactId>spring-boot-devtools</artifactId>
 		</dependency>
 	</dependencies>
-
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-sleuth-dependencies</artifactId>
+				<version>${sleuth.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.wavefront</groupId>
+				<artifactId>wavefront-spring-boot-bom</artifactId>
+				<version>${wavefront.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 	<build>
 		<plugins>
 			<plugin>
@@ -73,68 +119,69 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 			<plugin>
-    <groupId>com.github.eirslett</groupId>
-    <artifactId>frontend-maven-plugin</artifactId>
-    <version>1.6</version>
-    <configuration>
-        <workingDirectory>frontend</workingDirectory>
-        <installDirectory>target</installDirectory>
-    </configuration>
-    <executions>
-        <execution>
-            <id>install node and npm</id>
-            <goals>
-                <goal>install-node-and-npm</goal>
-            </goals>
-            <configuration>
-                <nodeVersion>v14.8.0</nodeVersion>
-                <npmVersion>6.14.8</npmVersion>
-            </configuration>
-        </execution>
-        <execution>
-            <id>npm install</id>
-            <goals>
-                <goal>npm</goal>
-            </goals>
-            <configuration>
-                <arguments>install react-scripts --save</arguments>
-            </configuration>
-        </execution>
-        <execution>
-            <id>npm run build</id>
-            <goals>
-                <goal>npm</goal>
-            </goals>
-            <configuration>
-                <arguments>run build</arguments>
-            </configuration>
-        </execution>
-    </executions>
-</plugin>
-<plugin>
-    <artifactId>maven-antrun-plugin</artifactId>
-    <executions>
-        <execution>
-            <phase>generate-resources</phase>
-            <configuration>
-                <target>
-                    <copy todir="${project.build.directory}/classes/public">
-                        <fileset dir="${project.basedir}/frontend/build"/>
-                    </copy>
-                    <copy todir="${project.build.directory}/classes/public/static">
-                        <fileset dir="${project.basedir}/frontend/build">
-                        	<include name="**/*.ico"></include>
-                        	<include name="**/*.json"></include>
-                        </fileset>
-                    </copy>
-                </target>
-            </configuration>
-            <goals>
-                <goal>run</goal>
-            </goals>
-        </execution>
-    </executions>
-</plugin>
+				<groupId>com.github.eirslett</groupId>
+				<artifactId>frontend-maven-plugin</artifactId>
+				<version>1.6</version>
+				<configuration>
+					<workingDirectory>frontend</workingDirectory>
+					<installDirectory>target</installDirectory>
+				</configuration>
+				<executions>
+					<execution>
+						<id>install node and npm</id>
+						<goals>
+							<goal>install-node-and-npm</goal>
+						</goals>
+						<configuration>
+							<nodeVersion>v14.8.0</nodeVersion>
+							<npmVersion>6.14.8</npmVersion>
+						</configuration>
+					</execution>
+					<execution>
+						<id>npm install</id>
+						<goals>
+							<goal>npm</goal>
+						</goals>
+						<configuration>
+							<arguments>install react-scripts --save</arguments>
+						</configuration>
+					</execution>
+					<execution>
+						<id>npm run build</id>
+						<goals>
+							<goal>npm</goal>
+						</goals>
+						<configuration>
+							<arguments>run build</arguments>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>generate-resources</phase>
+						<configuration>
+							<target>
+								<copy todir="${project.build.directory}/classes/public">
+									<fileset dir="${project.basedir}/frontend/build" />
+								</copy>
+								<copy
+									todir="${project.build.directory}/classes/public/static">
+									<fileset dir="${project.basedir}/frontend/build">
+										<include name="**/*.ico"></include>
+										<include name="**/*.json"></include>
+									</fileset>
+								</copy>
+							</target>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 
