@@ -179,6 +179,8 @@ jobs:
               # for now only one store
               export i=100
               
-              ytt -f config-rep/k8s/ -v storeId=store-${i} -v posUri=pos.apps.edge.wrightcode.io | kubectl -n edge-store create -f -
+              ytt -f config-repo/k8s/configmap.yaml -f config-repo/k8s/deployment.yaml -f config-repo/k8s/svc.yaml -f config-repo/k8s/pos-ui-httpproxy.yaml -f config-repo/k8s/values.yml \
+                 -v storeId=store-${i} -v image=((tanzu-edge-pos-ui.image))@$DIGEST -v posUri=pos.apps.edge.wrightcode.io | kapp deploy -n edge-store -a pos-ui -y -f -
+
 
 
