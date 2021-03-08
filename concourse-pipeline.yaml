@@ -150,6 +150,7 @@ jobs:
     - task: deploy-app
       params:
         KUBECONFIG_JSON: ((common-secrets.kubeconfigDeployServer))
+        SERVERLESS: ((tanzu-edge-pos-ui.serverless))
       config:
         platform: linux
         image_resource:
@@ -178,9 +179,13 @@ jobs:
 
               # for now only one store
               export i=100
-              
-              ytt -f config-repo/k8s/configmap.yaml -f config-repo/k8s/deployment.yaml -f config-repo/k8s/svc.yaml -f config-repo/k8s/pos-ui-httpproxy.yaml -f config-repo/k8s/values.yml \
-                 -v storeId=store-${i} -v image=((tanzu-edge-pos-ui.image))@$DIGEST -v posUri=pos.apps.edge.wrightcode.io | kapp deploy -n edge-store -a pos-ui -y -f -
-
+              if [ "$SERVERLESS" = "true" ]; then
+                 ytt -f config-repo/k8s/knative-service.yaml -f config-repo/k8s/values.yml \
+                    -v storeId=store-${i} -v image=((tanzu-edge-pos-ui.image))@$DIGEST -v posUri=pos.apps.edge.wrightcode.io > myservice.yaml
+                 kn service create -f myservice.yaml -n apps --force
+              else 
+                 ytt -f config-repo/k8s/configmap.yaml -f config-repo/k8s/deployment.yaml -f config-repo/k8s/svc.yaml -f config-repo/k8s/pos-ui-httpproxy.yaml -f config-repo/k8s/values.yml \
+                    -v storeId=store-${i} -v image=((tanzu-edge-pos-ui.image))@$DIGEST -v posUri=pos.apps.edge.wrightcode.io | kapp deploy -n edge-store -a pos-ui -y -f -
+              fi
 
 
