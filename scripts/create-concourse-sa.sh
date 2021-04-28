@@ -4,3 +4,4 @@ kubectl create clusterrolebinding concourse-default-binding --clusterrole=cluste
 kubectl create clusterrolebinding concourse-binding --clusterrole=cluster-admin --serviceaccount=concourse:concourse
 kubectl -n concourse-main get secrets
 echo "Don't forget to retrieve/set token from concourse service account and set in params.yaml"
+kubectl config view --flatten --minify | yq e - --tojson  --indent 0

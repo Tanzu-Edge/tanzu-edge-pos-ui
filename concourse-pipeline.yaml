@@ -16,6 +16,13 @@ resources:
   source:
     repository: ((tanzu-edge-pos-ui.image))
     tag: latest
+    username: ((common-secrets.harborUser))
+    password: ((common-secrets.harborPassword))
+- name: trigger
+  type: time
+  source: {interval: 30s}
+  check_every: 12h
+  webhook_token: hello 
 
 jobs:
 - name: continuous-integration
@@ -75,7 +82,7 @@ jobs:
               docker login ((common-secrets.harborDomain)) -u '((common-secrets.harborUser))' -p '((common-secrets.harborPassword))'
               echo $KUBECONFIG_JSON>tools-kubeconfig.json
               export KUBECONFIG=tools-kubeconfig.json
-              kubectl config set-credentials concourse --token=((common-secrets.kubernetesServiceAccountToken))
+              kubectl config set-credentials concourse --token=((common-secrets.kubernetesBuildServiceAccountToken))
               kubectl config set-context concourse-context --cluster=((common-secrets.kubernetesBuildCluster)) --user=concourse
               kubectl config use-context concourse-context
               set +e
@@ -104,8 +111,10 @@ jobs:
   serial: true
   plan:
     - get: app-image
+    - get: trigger
       trigger: true
     - get: config-repo
+      trigger: true
     - task: create-wavefront-event
       params:
         WAVEFRONT_API_TOKEN: ((tanzu-edge-pos-ui.wavefrontApiToken))
@@ -181,8 +190,8 @@ jobs:
               export i=100
               if [ "$SERVERLESS" = "true" ]; then
                  ytt -f config-repo/k8s/knative-service.yaml -f config-repo/k8s/values.yml \
-                    -v storeId=store-${i} -v image=((tanzu-edge-pos-ui.image))@$DIGEST -v posUri=pos.apps.edge.wrightcode.io > myservice.yaml
-                 kn service create -f myservice.yaml -n apps --force
+                    -v storeId=store-${i} -v image=((tanzu-edge-pos-ui.image))@$DIGEST > myservice.yaml
+                 kn service create --force --pull-secret harbor-pull-secret -f myservice.yaml -n apps 
               else 
                  ytt -f config-repo/k8s/configmap.yaml -f config-repo/k8s/deployment.yaml -f config-repo/k8s/svc.yaml -f config-repo/k8s/pos-ui-httpproxy.yaml -f config-repo/k8s/values.yml \
                     -v storeId=store-${i} -v image=((tanzu-edge-pos-ui.image))@$DIGEST -v posUri=pos.apps.edge.wrightcode.io | kapp deploy -n edge-store -a pos-ui -y -f -
