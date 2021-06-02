@@ -158,7 +158,7 @@ jobs:
 
     - task: deploy-app
       params:
-        KUBECONFIG_JSON: ((common-secrets.kubeconfigDeployServer))
+        KUBECONFIG_JSON: ((tanzu-edge-pos-ui.kubeconfigDeployServer))
         SERVERLESS: ((tanzu-edge-pos-ui.serverless))
       config:
         platform: linux
@@ -182,8 +182,8 @@ jobs:
               # TODO Need to setup the kubeconfig
               echo $KUBECONFIG_JSON>run-kubeconfig.json
               export KUBECONFIG=run-kubeconfig.json
-              kubectl config set-credentials concourse --token=((common-secrets.kubernetesDeployServiceAccountToken))
-              kubectl config set-context concourse-context --cluster=((common-secrets.kubernetesDeployCluster)) --user=concourse
+              kubectl config set-credentials concourse --token=((tanzu-edge-pos-ui.kubernetesDeployServiceAccountToken))
+              kubectl config set-context concourse-context --cluster=((tanzu-edge-pos-ui.kubernetesDeployCluster)) --user=concourse
               kubectl config use-context concourse-context
 
               # for now only one store
