@@ -1,0 +1,14 @@
+apiVersion: carto.run/v1alpha1
+kind: Workload
+metadata:
+  name: tanzu-edge-pos-ui
+  labels:
+    app.kubernetes.io/part-of: tanzu-edge-pos-ui
+    apps.tanzu.vmware.com/workload-type: web
+    apps.tanzu.vmware.com/has-tests: "true"
+spec:
+  source:
+    git:
+      url: https://github.com/Tanzu-Edge/tanzu-edge-pos-ui
+      ref:
+        branch: main
