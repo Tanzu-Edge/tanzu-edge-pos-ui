@@ -2,6 +2,9 @@
   "name": "tanzu-point-of-sale",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": "17.1.x"
+  },
   "dependencies": {
     "@clr/ui": "^13.3.1",
     "@date-io/date-fns": "^2.14.0",
