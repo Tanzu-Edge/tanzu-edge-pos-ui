@@ -14,10 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
-import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Metrics;
-import io.opentracing.Tracer;
 import vmw.tanzu.gaf.pos.dao.entity.Sale;
 
 @RestController
@@ -27,7 +24,7 @@ public class SalesController {
 	@Autowired
 	private RestTemplate restTemplate;
 	
-	@Value("${posBackend:'http://localhost:8080/api/sales/blah'}")
+	@Value("${posBackend:localhost:8080/api/sales/blah}")
 	private String posBackend;
 	
 	@Value("${pos.storeId}")
@@ -37,9 +34,6 @@ public class SalesController {
     public String initTransaction() {
 		return this.generateTransactionId();
     }
-	
-	@Autowired
-    private Tracer tracer;
 	
 	@PostMapping("/api/sales/blah")
 	public void blahTransaction(@RequestBody Sale sale){
@@ -76,8 +70,8 @@ public class SalesController {
 			//System.out.println("Empty Result Set");
 		}
 		cnt++;		
-		String insertQuery = "INSERT INTO \"transaction_id\"(\"createdAt\", \"updatedAt\", \"id\", \"count\", \"createdById\", \"updatedById\") VALUES (datetime('now'), datetime('now'), ?, ?, ?, ?)";
-		String updateQuery = "UPDATE \"transaction_id\" SET \"count\" = ?, \"updatedAt\" = datetime('now') WHERE \"id\" = ?";
+		String insertQuery = "INSERT INTO \"transaction_id\"(\"createdAt\", \"updatedAt\", \"id\", \"count\", \"createdById\", \"updatedById\") VALUES (now(), now(), ?, ?, ?, ?)";
+		String updateQuery = "UPDATE \"transaction_id\" SET \"count\" = ?, \"updatedAt\" = now() WHERE \"id\" = ?";
 		if(cnt==1) {
 			jdbcTemplate.update(insertQuery, zdtString, cnt, "admin", "admin");
 		}else {
@@ -86,8 +80,8 @@ public class SalesController {
 			
 		String headerId = zdtString+cnt;
 		String transactionHeader = "INSERT INTO \"transaction_header\"(\"createdAt\", \"updatedAt\", \"id\", \"discountOnItems\", \"discountOnTotal\", \"tax\", \"taxPercentageString\", \"billAmount\", \"netAmount\", "
-				+ "\"amountPaid\", \"salesType\", \"transactionStatus\", \"comments\", \"customerId\", \"isActive\", \"createdById\", \"updatedById\") VALUES (datetime('now'), datetime('now'), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, NULL, ?, ?, ?)";
-		jdbcTemplate.update(transactionHeader,headerId,0,0,0,"",0,0,0,1,0,1,"admin","admin");
+				+ "\"amountPaid\", \"salesType\", \"transactionStatus\", \"comments\", \"customerId\", \"isActive\", \"createdById\", \"updatedById\") VALUES (now(), now(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, NULL, ?, ?, ?)";
+		jdbcTemplate.update(transactionHeader,Integer.parseInt(headerId),0,0,0,"",0,0,0,1,0,true,"admin","admin");
 		
 		return headerId;
 	}

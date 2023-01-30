@@ -10,19 +10,19 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import vmw.tanzu.gaf.pos.dao.entity.AuthResponse;
-import vmw.tanzu.gaf.pos.dao.entity.User;
+import vmw.tanzu.gaf.pos.dao.entity.PosUser;
 
 @RestController
 public class AuthController {
 	
 	@PostMapping("/api/login")
-    public AuthResponse login(@RequestBody User user) throws Exception{
+    public AuthResponse login(@RequestBody PosUser user) throws Exception{
 		AuthResponse rsp = new AuthResponse();
 		
 		if(user.getUserid()!=null 
 				&& user.getPassword()!=null) {
 			
-			User dbUser = this.searchQuery(user.getUserid());
+			PosUser dbUser = this.searchQuery(user.getUserid());
 			if(dbUser!=null
 					&& dbUser.getPassword()!= null
 					&& dbUser.getPassword().equals(user.getPassword())) {
@@ -53,16 +53,16 @@ public class AuthController {
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
     
-	public User searchQuery(String id) {
+	public PosUser searchQuery(String id) {
 
 		String userQuey="";
 		
-		userQuey = "SELECT * FROM user where id = '"+id+"'"  ;
+		userQuey = "SELECT * FROM pos_user where id = '"+id+"'"  ;
 		
 		System.out.println("User query : " + userQuey);
 		//Read records:
-		List<User> usrs = jdbcTemplate.query(userQuey,
-				(resultSet, rowNum) -> new User(resultSet.getString("id"), 
+		List<PosUser> usrs = jdbcTemplate.query(userQuey,
+				(resultSet, rowNum) -> new PosUser(resultSet.getString("id"), 
 						resultSet.getString("password")));
 		
 		return usrs.get(0);

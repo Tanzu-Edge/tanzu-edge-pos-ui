@@ -1,6 +1,8 @@
 spring:
   datasource:
-    url: jdbc:sqlite::resource:database.sqlite
+    url: jdbc:postgresql://localhost:5432/tanzu-pos
+    username: tanzu
+    password: tanzu
   sleuth:
     baggage:
       remoteFields:
@@ -28,3 +30,4 @@ management:
         
 pos:
   storeId: whichSite
+posBackend: http://localhost/api/test

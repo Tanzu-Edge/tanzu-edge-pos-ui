@@ -91,7 +91,7 @@ public class VendorsController {
 	}
 	
 	public void insertQuery(Vendor vendor) {
-		String insertQuery = "INSERT INTO \"vendor\"(\"createdAt\", \"updatedAt\", \"id\", \"description\", \"name\", \"address\", \"email\", \"mobile\", \"createdById\", \"updatedById\") VALUES (datetime('now'), datetime('now'), ?, ?, ?, ?, ?, ?, ?, ?) ";
+		String insertQuery = "INSERT INTO \"vendor\"(\"createdAt\", \"updatedAt\", \"id\", \"description\", \"name\", \"address\", \"email\", \"mobile\", \"createdById\", \"updatedById\") VALUES (now(), now(), ?, ?, ?, ?, ?, ?, ?, ?) ";
 		jdbcTemplate.update(insertQuery, vendor.getId(), vendor.getDescription(), vendor.getName(), vendor.getAddress(), vendor.getEmail(),vendor.getMobile(),"admin", "admin");
 		return;
 	}

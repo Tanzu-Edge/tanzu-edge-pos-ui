@@ -92,7 +92,7 @@ public class ProductTypesController {
 	}
 	
 	public void insertQuery(ProductType product) {
-		String insertQuery = "INSERT INTO \"product_type\"(\"createdAt\", \"updatedAt\", \"id\", \"description\", \"createdById\", \"updatedById\") VALUES (datetime('now'), datetime('now'), ?, ?, ?, ?) ";
+		String insertQuery = "INSERT INTO \"product_type\"(\"createdAt\", \"updatedAt\", \"id\", \"description\", \"createdById\", \"updatedById\") VALUES (now(), now(), ?, ?, ?, ?) ";
 		jdbcTemplate.update(insertQuery, product.getId(), product.getDescription(), "admin", "admin");
 		return;
 	}

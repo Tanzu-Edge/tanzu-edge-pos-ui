@@ -94,7 +94,7 @@ public class ProductController {
 	}
 	
 	public void insertQuery(Product product) {
-		String insertQuery = "INSERT INTO \"product\"(\"createdAt\", \"updatedAt\", \"id\", \"name\", \"description\", \"costPrice\", \"sellingPrice\", \"productTypeId\", \"createdById\", \"updatedById\") VALUES (datetime('now'), datetime('now'), ?, ?, ?, ?, ?, ?, ?, ?) ";
+		String insertQuery = "INSERT INTO \"product\"(\"createdAt\", \"updatedAt\", \"id\", \"name\", \"description\", \"costPrice\", \"sellingPrice\", \"productTypeId\", \"createdById\", \"updatedById\") VALUES (now(), now(), ?, ?, ?, ?, ?, ?, ?, ?) ";
 		jdbcTemplate.update(insertQuery, product.getId(), product.getName(), product.getDescription(), product.getCostPrice(), product.getSellingPrice(), product.getProductTypeId(), "admin", "admin");
 		return;
 	}
